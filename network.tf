@@ -31,6 +31,8 @@ resource "google_compute_global_address" "private_ip_address" {
 
 resource "google_service_networking_connection" "private_vpc_connection" {
   provider = google-beta
+  
+  depends_on = [google_project_service.cloudresourcemanager]
 
   network                 = google_compute_network.private_network.self_link
   service                 = "servicenetworking.googleapis.com"
