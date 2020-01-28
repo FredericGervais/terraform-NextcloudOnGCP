@@ -5,7 +5,7 @@
 
 resource "google_filestore_instance" "instance" {
   name = "nfsshare-${random_id.db_name_suffix.hex}"
-  tier = "STANDARD"
+  tier = "PREMIUM"
   zone = "us-east1-b"
 
   file_shares {
