@@ -4,13 +4,18 @@
 #  var.region
 #
 
+resource "google_project_service" "sql" {
+  service            = "sqladmin.googleapis.com"
+  disable_on_destroy = false
+}
+
 resource "google_sql_database_instance" "master" {
   provider = google-beta
 
   name             = "${var.app-name}-database-${random_id.db_name_suffix.hex}"
   database_version = "MYSQL_5_7"
   region           = var.region
-  depends_on       = [google_service_networking_connection.private_vpc_connection]
+  depends_on       = [google_service_networking_connection.private_vpc_connection, google_project_service.sql]
 
   settings {
     # Second-generation instance tiers are based on the machine
