@@ -6,8 +6,15 @@
 #
 #
 
+resource "google_project_service" "cloudresourcemanager" {
+  service            = "cloudresourcemanager.googleapis.com"
+  disable_on_destroy = false
+}
+
 resource "google_compute_network" "private_network" {
   provider = google-beta
+  
+  depends_on = [google_project_service.cloudresourcemanager]
 
   name = var.network-name
 }
