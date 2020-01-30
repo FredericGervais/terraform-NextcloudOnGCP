@@ -12,7 +12,7 @@ resource "google_project_service" "kubernetes" {
 resource "google_container_cluster" "primary" {
   provider = google-beta
 
-  name     = "terraform-owncloud-${random_id.cluster_name_suffix.hex}"
+  name     = "terraform-${var.app-name}-${random_id.cluster_name_suffix.hex}"
   location = var.region
   depends_on = [
     google_compute_network.private_network,

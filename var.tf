@@ -15,7 +15,7 @@ variable "zone" {
 
 variable "app-name" {
   type    = string
-  default = "owncloud"
+  default = "nextcloud"
 }
 
 provider "google" {
