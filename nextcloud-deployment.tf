@@ -34,7 +34,7 @@ resource "kubernetes_secret" "database-credentials" {
 }
 
 resource "kubernetes_deployment" "application" {
-  depends_on = [kubernetes_secret.database-credentials]
+  depends_on = [kubernetes_secret.database-credentials, kubernetes_service.expose]
 
   metadata {
     name = "${var.app-name}-deployment"
@@ -69,6 +69,18 @@ resource "kubernetes_deployment" "application" {
           volume_mount {
             name       = "nfs-volume"
             mount_path = "/var/www/html"
+          }
+          env {
+            name  = "NEXTCLOUD_ADMIN_USER"
+            value = var.nextcloud_admin_user
+          }
+          env {
+            name  = "NEXTCLOUD_ADMIN_PASSWORD"
+            value = random_id.nextcloud_admin_password.b64_url
+          }
+          env {
+            name  = "NEXTCLOUD_TRUSTED_DOMAINS"
+            value = "${kubernetes_service.expose.load_balancer_ingress[0].ip}.xip.io"
           }
           env {
             name  = "MYSQL_HOST"
@@ -138,4 +150,28 @@ resource "kubernetes_service" "expose" {
     type = "LoadBalancer"
   }
 }
+
+output "Website_Public_IP" {
+  value       = "${kubernetes_service.expose.load_balancer_ingress[0].ip}.xip.io"
+  description = "The name of the databse user"
+  sensitive   = false
+}
+
+output "Website_Admin_user" {
+  depends_on = [kubernetes_service.expose]
+
+  value       = var.nextcloud_admin_user
+  description = "The name of the databse user"
+  sensitive   = false
+}
+
+output "Website_Admin_password" {
+  depends_on = [kubernetes_service.expose]
+  
+  value       = random_id.nextcloud_admin_password.b64_url
+  description = "The name of the databse user"
+  sensitive   = false
+}
+
+
 

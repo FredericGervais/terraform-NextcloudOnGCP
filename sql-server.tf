@@ -46,3 +46,20 @@ resource "google_sql_user" "users" {
   password = random_id.db_user_password.b64_url
 }
 
+output "Database_host_IP" {
+  value       = google_sql_database_instance.master.private_ip_address
+  description = "The private IP of the database instance"
+  sensitive   = false
+}
+
+output "Database_User" {
+  value       = google_sql_user.users.name
+  description = "The name of the databse user"
+  sensitive   = false
+}
+
+output "Database_Password" {
+  value       = google_sql_user.users.password
+  description = "The password of the database user"
+  sensitive   = true
+}

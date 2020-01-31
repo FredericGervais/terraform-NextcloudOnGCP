@@ -19,3 +19,8 @@ resource "google_filestore_instance" "instance" {
   }
 }
 
+output "NFS_share_path" {
+  value       = "${google_filestore_instance.instance.networks[0].ip_addresses[0]}/${google_filestore_instance.instance.file_shares[0].name}"
+  description = "The path to the NFS share"
+  sensitive   = false
+}
