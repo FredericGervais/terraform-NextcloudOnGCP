@@ -44,7 +44,7 @@ resource "kubernetes_deployment" "application" {
   }
 
   spec {
-    replicas = 2
+    replicas = 1
 
     selector {
       match_labels = {
@@ -64,11 +64,19 @@ resource "kubernetes_deployment" "application" {
           image = "nextcloud:latest"
           name  = var.app-name
           port {
-            container_port = 8080
+            container_port = 80
           }
           volume_mount {
             name       = "nfs-volume"
             mount_path = "/var/www/html"
+          }
+          liveness_probe {
+            http_get {
+              path = "/status.php"
+              port = 80
+            }
+            initial_delay_seconds = 240
+            period_seconds        = 3
           }
           env {
             name  = "NEXTCLOUD_ADMIN_USER"
@@ -80,7 +88,7 @@ resource "kubernetes_deployment" "application" {
           }
           env {
             name  = "NEXTCLOUD_TRUSTED_DOMAINS"
-            value = "${kubernetes_service.expose.load_balancer_ingress[0].ip}.xip.io"
+            value = kubernetes_service.expose.load_balancer_ingress[0].ip
           }
           env {
             name  = "MYSQL_HOST"
@@ -152,7 +160,7 @@ resource "kubernetes_service" "expose" {
 }
 
 output "Website_Public_IP" {
-  value       = "${kubernetes_service.expose.load_balancer_ingress[0].ip}.xip.io"
+  value       = kubernetes_service.expose.load_balancer_ingress[0].ip
   description = "The name of the databse user"
   sensitive   = false
 }
